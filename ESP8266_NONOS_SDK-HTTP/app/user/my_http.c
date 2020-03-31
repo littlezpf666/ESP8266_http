@@ -6,6 +6,7 @@
  */
 #include"my_http.h"
 extern struct espconn user_tcp_conn;
+
 char host[32];
 char filename[128];
 char port;
@@ -79,14 +80,19 @@ void ICACHE_FLASH_ATTR user_esp_platform_dns_found(const char * name,ip_addr_t *
 
 
 }
-void ICACHE_FLASH_ATTR Http_Read_File(char *URL)
+
+void ICACHE_FLASH_ATTR Http_Read_File(char *URL,char *module,char *buffer)
 {
 	ip_addr_t site_server_ip;
-
+    memset(buffer,0,128);
 	/*---------------------解析URL获取域名 、文件名、 端口号-------------------------*/
 	http_parse_request_url(URL,host,filename,&port);
-	os_printf("host: %s\r\n",host);
-
-	/*--------------------------------获取服务器IP地址--------------------------------------*/
+	os_printf("host:%s\r\n",host);
+    if(!strcmp("GET",module))
+    {
+    	os_sprintf(buffer,"GET https://%s HTTP/1.1\r\nHost:%s\r\nConnection:close\r\n\r\n",host,host);
+    	os_printf("\r\nSend_buffer:%s\r\n",buffer);
+    }
+	/*--------------------------------获取服务器IP地址-----------------------------*/
 	espconn_gethostbyname(&user_tcp_conn,host,&site_server_ip,user_esp_platform_dns_found);
 }

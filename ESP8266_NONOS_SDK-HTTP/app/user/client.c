@@ -7,6 +7,7 @@
 #include "client.h"
 
 extern struct espconn user_tcp_conn;
+extern char Send_buffer[128];//注意不要用extern char *Send_buffer要严格与原声名一致
 void ICACHE_FLASH_ATTR station_recv_cb(void*arg, char*pdata, unsigned short len) {
 
 	os_printf("Accept Data:%s\r\n", pdata);
@@ -32,7 +33,8 @@ void client_conned_server_cb (void	*arg)
 	espconn_regist_recvcb((struct espconn*) arg, station_recv_cb);
 	espconn_regist_sentcb((struct espconn*) arg, station_sent_cb);
 	espconn_regist_disconcb((struct espconn*) arg, station_discon_cb);
-	espconn_send(pesp_conn, HEAD, os_strlen(HEAD));
+	os_printf("\r\nSend_buffer:%s\r\n",Send_buffer);
+	espconn_send(pesp_conn, Send_buffer, os_strlen(Send_buffer));
 
 }
 

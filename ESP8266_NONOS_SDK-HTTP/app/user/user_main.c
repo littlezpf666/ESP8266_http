@@ -96,20 +96,19 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
 	}
 }
 struct espconn user_tcp_conn;
-
+char Send_buffer[128];
 ETSTimer AP_check;
 /***************************接收到station的连接每2s进入一次**********************************/
 void ICACHE_FLASH_ATTR Wifi_conned(void *arg){
 	static uint8 count=0;
-	uint8 status;
+
 	os_timer_disarm(&AP_check);
 	count++;
 	//获取ESP8266连接的station的IP
-	status=wifi_station_get_connect_status();
-	if(status==STATION_GOT_IP)
+	if(wifi_station_get_connect_status()==STATION_GOT_IP)
 	{
 		os_printf("Wifi connect success\r\n");
-		Http_Read_File("https://www.baidu.com/");
+		Http_Read_File("https://www.baidu.com/","GET",Send_buffer);
 	}
 	else
 	{
